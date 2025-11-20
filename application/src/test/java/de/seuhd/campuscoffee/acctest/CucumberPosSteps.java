@@ -1,7 +1,9 @@
 package de.seuhd.campuscoffee.acctest;
 
 import de.seuhd.campuscoffee.api.dtos.PosDto;
+import de.seuhd.campuscoffee.domain.impl.PosServiceImpl;
 import de.seuhd.campuscoffee.domain.model.CampusType;
+import de.seuhd.campuscoffee.domain.model.Pos;
 import de.seuhd.campuscoffee.domain.model.PosType;
 import de.seuhd.campuscoffee.domain.ports.PosService;
 import io.cucumber.java.*;
@@ -10,6 +12,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import io.restassured.RestAssured;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -61,7 +64,7 @@ public class CucumberPosSteps {
     }
 
     private List<PosDto> createdPosList;
-    private PosDto updatedPos;
+    private Pos neupos;
 
     /**
      * Register a Cucumber DataTable type for PosDto.
@@ -92,7 +95,11 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Given step for new scenario
-
+    @Given("the following POS exist")
+    public void theFollowingPosExist(List<PosDto> posList) {
+        createdPosList = createPos(posList);
+        assertThat(createdPosList).size().isEqualTo(posList.size());
+    }
     // When -----------------------------------------------------------------------
 
     @When("I insert POS with the following elements")
@@ -100,8 +107,13 @@ public class CucumberPosSteps {
         createdPosList = createPos(posList);
         assertThat(createdPosList).size().isEqualTo(posList.size());
     }
-
     // TODO: Add When step for new scenario
+
+    @When("I change the houseNumber of New Vending Machine to \"99b\"")
+    public void changeHouseNumberOfNewVendingMachineTo99b() {
+        Pos pos = posService.getByName("New Vending Machine");
+        neupos = pos.toBuilder().houseNumber("99b").build(); //wir überschreiben unser altes pos mit unserem neuen übernimmt id, müssen wir so machen weil pos ist immutable.
+    } // wir haben neupos oben als private deklariert. Sonnst ist sie local.
 
     // Then -----------------------------------------------------------------------
 
@@ -114,4 +126,8 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Then step for new scenario
+    @Then("The houseNumber of New Vending Machine should be \"99b\"")
+    public void theHouseNumberOfNewVendingMachineShouldBe99b() {
+        assertThat(neupos.houseNumber()).isEqualTo("99b");
+    }
 }

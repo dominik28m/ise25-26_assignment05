@@ -61,7 +61,7 @@ curl http://localhost:8080/api/pos/1 # add valid POS id here
 
 POS by name:
 ```shell
-curl http://localhost:8080/api/pos/filter?name=Schmelzpunkt # add valid POS name here
+curl http://localhost:8080/api/pos/filter\?name=Schmelzpunkt
 ```
 
 #### Create POS
